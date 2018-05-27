@@ -1,6 +1,6 @@
 import sys
 import pygame
-from bullet import Bullet
+from component.bullet import Bullet
 
 #偵測按下的事件
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
@@ -14,6 +14,10 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
 		ship.moving_down = True
 	elif event.key == pygame.K_SPACE:
 		fire_bullet(ai_settings, screen, ship, bullets)
+	elif event.key == pygame.K_q:
+		sys.exit()
+
+
 
 #發射子彈
 def fire_bullet(ai_settings, screen, ship, bullets):
