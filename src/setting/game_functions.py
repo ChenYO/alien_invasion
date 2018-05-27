@@ -1,6 +1,6 @@
 import sys
 import pygame
-from component.bullet import Bullet
+from player.bullet import Bullet
 
 #偵測按下的事件
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
@@ -48,7 +48,7 @@ def check_events(ai_settings, screen, ship, bullets):
 				
 
 #更新畫面
-def update_screen(ai_settings, screen, ship, bullets):
+def update_screen(ai_settings, screen, ship, alien, bullets):
 	screen.fill(ai_settings.bg_color)
 
 	#繪製子彈
@@ -56,6 +56,7 @@ def update_screen(ai_settings, screen, ship, bullets):
 		bullet.draw_bullet()
 
 	ship.blitme()
+	alien.blitme()
 	pygame.display.flip()
 
 #更新子彈畫面
