@@ -18,7 +18,9 @@ class Ship():
 
 		#設定太空船初始的位置
 		self.rect.centerx = self.screen_rect.centerx
-		self.rect.centery = self.screen_rect.centery
+		self.rect.bottom = self.screen_rect.bottom
+		#self.rect.centerx = self.screen_rect.centerx
+		#self.rect.centery = self.screen_rect.centery
 
 
 		self.centerx = float(self.rect.centerx)

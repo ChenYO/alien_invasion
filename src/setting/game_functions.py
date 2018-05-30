@@ -61,13 +61,15 @@ def update_screen(ai_settings, screen, ship, aliens, bullets):
 	pygame.display.flip()
 
 #更新子彈畫面
-def update_bullets(bullets):
+def update_bullets(aliens, bullets):
 	for bullet in bullets.copy():
 		#向右發射
 		#if bullet.rect.x >= screen.get_rect().right:
 		#刪除子彈，以免浪費記憶體效能
 		if bullet.rect.bottom <= 0:
 			bullets.remove(bullet)
+
+	collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
 
 
 #計算要放幾行艦隊
@@ -102,3 +104,20 @@ def create_fleet(ai_settings, screen, ship, aliens):
 	for row_number in range(number_rows):
 		for alien_number in range(number_aliens_x):
 			create_alien(ai_settings, screen, aliens, alien_number, row_number)
+
+#偵測外星人是否撞到牆壁
+def check_fleet_edges(ai_settings, aliens):
+	for alien in aliens.sprites():
+		if alien.check_edges():
+			change_fleet_direction(ai_settings, aliens)
+			break;
+
+def change_fleet_direction(ai_settings, aliens):
+	for alien in aliens.sprites():
+		alien.rect.y += ai_settings.fleet_drop_speed
+	ai_settings.fleet_direction *= -1
+
+#更新外星人動作
+def update_aliens(ai_settings, aliens):
+	check_fleet_edges(ai_settings, aliens)
+	aliens.update()
