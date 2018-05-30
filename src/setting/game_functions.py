@@ -2,6 +2,7 @@ import sys
 import pygame
 from player.bullet import Bullet
 from enemy.alien import Alien
+from time import sleep
 
 #偵測按下的事件
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
@@ -61,7 +62,7 @@ def update_screen(ai_settings, screen, ship, aliens, bullets):
 	pygame.display.flip()
 
 #更新子彈畫面
-def update_bullets(aliens, bullets):
+def update_bullets(ai_settings,screen, ship, aliens, bullets):
 	for bullet in bullets.copy():
 		#向右發射
 		#if bullet.rect.x >= screen.get_rect().right:
@@ -69,8 +70,16 @@ def update_bullets(aliens, bullets):
 		if bullet.rect.bottom <= 0:
 			bullets.remove(bullet)
 
+	check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets)
+	
+
+#偵測子彈與外星人的碰撞
+def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
 	collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
 
+	if len(aliens) == 0:
+		bullets.empty()
+		create_fleet(ai_settings, screen, ship, aliens)
 
 #計算要放幾行艦隊
 def get_number_rows(ai_settings, ship_hight, alien_height):
@@ -118,6 +127,32 @@ def change_fleet_direction(ai_settings, aliens):
 	ai_settings.fleet_direction *= -1
 
 #更新外星人動作
-def update_aliens(ai_settings, aliens):
+def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
 	check_fleet_edges(ai_settings, aliens)
 	aliens.update()
+
+	if pygame.sprite.spritecollideany(ship, aliens):
+		ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+		check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
+
+#偵測太空船撞擊事件
+def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
+	if stats.ships_left > 0:
+		stats.ships_left -= 1
+		aliens.empty()
+		bullets.empty()
+
+		create_fleet(ai_settings, screen, ship, aliens)
+		ship.center_ship()
+
+		sleep(0.5)
+	else:
+		stats.game_active = False
+
+def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
+	screen_rect = screen.get_rect()
+	for alien in aliens.sprites():
+		ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+		break
+
+

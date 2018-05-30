@@ -47,6 +47,9 @@ class Ship():
 		self.rect.centerx = self.centerx
 		self.rect.centery = self.centery
 
+	def center_ship(self):
+		self.center = self.screen_rect.centerx
+		
 	def blitme(self):
 		#畫製太空船
 		self.screen.blit(self.image, self.rect)
