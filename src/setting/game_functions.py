@@ -43,7 +43,7 @@ def check_keyup_events(event, ship):
 		ship.moving_down = False
 
 #偵測事件
-def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets):
+def check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets):
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			sys.exit()
@@ -53,11 +53,11 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)
 			check_keyup_events(event, ship)
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			mouse_x, mouse_y = pygame.mouse.get_pos()
-			check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
+			check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y)
 				
 
 #偵測是否按下play按鍵
-def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y):
+def check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y):
 	#偵測是否按在按鈕上
 	button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
 
@@ -66,6 +66,10 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
 		pygame.mouse.set_visible(False)
 		stats.reset_stats()
 		stats.game_active = True
+
+		sb.prep_score()
+		sb.prep_high_score()
+		sb.prep_level()
 
 		aliens.empty()
 		bullets.empty()
@@ -102,7 +106,7 @@ def update_bullets(ai_settings,screen, stats, sb, ship, aliens, bullets):
 	check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets)
 	
 
-#偵測子彈與外星人的碰撞
+#偵測子彈與外星人的碰撞,並計算分數
 def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets):
 	collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
 
@@ -110,10 +114,14 @@ def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, 
 		for aliens in collisions.values():
 			stats.score += ai_settings.alien_points * len(aliens)
 			sb.prep_score()
+		check_high_score(stats, sb)
 
 	if len(aliens) == 0:
 		bullets.empty()
 		ai_settings.increase_speed()
+
+		stats.level += 1
+		sb.prep_level()
 		create_fleet(ai_settings, screen, ship, aliens)
 
 #計算要放幾行艦隊
@@ -191,4 +199,7 @@ def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
 		ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
 		break
 
-
+def check_high_score(stats, sb):
+	if stats.score > stats.high_score:
+		stats.high_score = stats.score
+		sb.prep_high_score()
